@@ -1,0 +1,455 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics Class: SysStopwatch unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #SysStopwatch
+    PROPERTIES
+      Name                #SysStopwatch
+      Extends             #
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #//
+        #// https://github.com/mazzy-ax/SysStopwatch
+        #//
+        #// класс обертка класса System.Diagnostics.Stopwatch
+        #// см. https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.stopwatch
+        #//
+        #// быстрый и эффективный класс:
+        #// + не задействует метод new(), поэтому можно спокойно использовать classFactory.createClass() и другие фабрики
+        #// + объекты создаются в памяти только по необходимости
+        #// + минимум вычислений на X++, форматирование и преобразование в строку выполняется в .net
+        #// + скрывает взаимодействие с CLR - программист может просто использовать X++ класс в своем коде
+        #// + метод stopwatch() возвращает CLR-объект  - программист может получить доступ ко всей функциональности .net-объекта
+        #// + метод toString() позволяет видеть время выполнения в отладчике
+        #//
+        #class SysStopwatch
+        #{
+        #    System.Diagnostics.Stopwatch stopwatch;
+        #}
+      ENDSOURCE
+      SOURCE #elapsed
+        #// возвращает строку со временем выполнения в формате [-][d.]hh:mm:ss (без миллисекунд)
+        #public str elapsed()
+        #{
+        #    str   ret;
+        #    int64 ticks;
+        #    int64 ticksPerSecond = 10000000; // https://docs.microsoft.com/en-us/dotnet/api/system.timespan.tickspersecond
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    ticks = stopwatch.get_ElapsedTicks();
+        #    ticks -= ticks mod ticksPerSecond;  // отбросим миллисекунды
+        #
+        #    ret = System.TimeSpan::FromTicks(ticks).ToString();
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #ElapsedMilliseconds
+        #public int64 elapsedMilliseconds()
+        #{
+        #    int64 ret;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    ret = stopwatch.get_ElapsedMilliseconds();
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #elapsedTicks
+        #public int64 elapsedTicks()
+        #{
+        #    int64 ret;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    ret = stopwatch.get_ElapsedTicks();
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #elapsedWide
+        #// возвращает строку со временем выполнения в формате [-][d.]hh:mm:ss[.ffffff] (с миллисекундами)
+        #public str elapsedWide()
+        #{
+        #    str ret;
+        #    System.TimeSpan timespan;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    timespan = stopwatch.get_Elapsed();
+        #
+        #    ret = timespan.ToString();
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #ensureInitialized
+        #protected void ensureInitialized()
+        #{
+        #    if( !stopwatch )
+        #    {
+        #        stopwatch = new System.Diagnostics.Stopwatch();
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #isRunning
+        #public boolean isRunning()
+        #{
+        #    boolean ret;
+        #
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    ret = stopwatch.get_IsRunning();
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #reset
+        #public SysStopwatch reset()
+        #{
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    stopwatch.Reset();
+        #
+        #    return this;
+        #}
+      ENDSOURCE
+      SOURCE #start
+        #public SysStopwatch start()
+        #{
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    stopwatch.Start();
+        #
+        #    return this;
+        #}
+      ENDSOURCE
+      SOURCE #stop
+        #public SysStopwatch stop()
+        #{
+        #    new InteropPermission(InteropKind::ClrInterop).assert();
+        #
+        #    this.ensureInitialized();
+        #
+        #    stopwatch.Stop();
+        #
+        #    return this;
+        #}
+      ENDSOURCE
+      SOURCE #stopwatch
+        #public System.Diagnostics.Stopwatch stopwatch()
+        #{
+        #    this.ensureInitialized();
+        #
+        #    return stopwatch;
+        #}
+      ENDSOURCE
+      SOURCE #toString
+        #public str toString()
+        #{
+        #    return this.elapsed();
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #public static SysStopwatch construct()
+        #{
+        #    return new SysStopwatch();
+        #}
+        #
+      ENDSOURCE
+      SOURCE #startNew
+        #public static SysStopwatch startNew()
+        #{
+        #    return SysStopwatch::construct().start();
+        #}
+        #
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics Class: SysStopwatchTest unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #SysStopwatchTest
+    PROPERTIES
+      Name                #SysStopwatchTest
+      Extends             #SysTestCase
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #//
+        #// https://github.com/mazzy-ax/SysStopwatch
+        #//
+        #class SysStopwatchTest extends SysTestCase
+        #{
+        #}
+      ENDSOURCE
+      SOURCE #testConstruct
+        #void testConstruct()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #
+        #    this.assertNotNull(stopwatch);
+        #    this.assertTrue(SysDictClass::is(stopwatch, classnum(SysStopwatch)));
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testElapsed
+        #void testElapsed()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #    str elapsed;
+        #
+        #    sleep(50);
+        #    elapsed = stopwatch.elapsed();
+        #
+        #    this.assertTrue(match(@'^:d:d\::d:d\::d:d$', elapsed), elapsed);
+        #}
+      ENDSOURCE
+      SOURCE #testElapsed_NotStarted
+        #void testElapsed_NotStarted()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #
+        #    this.assertNotNull(stopwatch);
+        #    this.assertEquals('00:00:00', stopwatch.elapsed());
+        #}
+      ENDSOURCE
+      SOURCE #testElapsedMilliseconds
+        #void testElapsedMilliseconds()
+        #{
+        #    SysStopwatch sysStopWatch = SysStopWatch::startNew();
+        #    int64 zero = 0;
+        #;
+        #    sleep(50);
+        #
+        #    this.assertNotNull(sysStopWatch);
+        #    this.assertNotEqual(zero, sysStopWatch.elapsedMilliseconds());
+        #}
+      ENDSOURCE
+      SOURCE #testElapsedMilliseconds_NotStarted
+        #void testElapsedMilliseconds_NotStarted()
+        #{
+        #    SysStopwatch sysStopWatch = SysStopWatch::construct();
+        #    int64 zero = 0;
+        #;
+        #    this.assertNotNull(sysStopWatch);
+        #    this.assertEquals(zero, sysStopWatch.elapsedMilliseconds());
+        #}
+      ENDSOURCE
+      SOURCE #testElapsedWideFormat
+        #void testElapsedWideFormat()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #    str elapsed;
+        #
+        #    sleep(50);
+        #    elapsed = stopwatch.elapsedWide();
+        #
+        #    this.assertTrue(match(@'^:d:d\::d:d\::d:d\.:d+$', elapsed), elapsed);
+        #}
+      ENDSOURCE
+      SOURCE #testElapsedWideFormat_NotStarted
+        #void testElapsedWideFormat_NotStarted()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #
+        #    this.assertNotNull(stopwatch);
+        #    this.assertEquals('00:00:00', stopwatch.elapsedWide());
+        #}
+      ENDSOURCE
+      SOURCE #testIsRunning
+        #void testIsRunning()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #
+        #    sleep(50);
+        #
+        #    this.assertTrue(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testIsRunning_Immediately
+        #void testIsRunning_Immediately()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #
+        #    this.assertTrue(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testIsRunning_NotStarted
+        #void testIsRunning_NotStarted()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testIsRunning_Reset
+        #void testIsRunning_Reset()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #
+        #    stopwatch.reset();
+        #
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testIsRunning_Start
+        #void testIsRunning_Start()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #
+        #    this.assertTrue(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testIsRunning_Stop
+        #void testIsRunning_Stop()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testReset
+        #void testReset()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #    int64 zero = 0;
+        #
+        #    sleep(50);
+        #    stopwatch.reset();
+        #
+        #    this.assertEquals(zero, stopwatch.elapsedMilliseconds());
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testReset_NotStarted
+        #void testReset_NotStarted()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #    int64 zero = 0;
+        #
+        #    this.assertEquals(zero, stopwatch.elapsedMilliseconds());
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testStartNew
+        #void testStartNew()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #
+        #    this.assertNotNull(stopwatch);
+        #    this.assertTrue(SysDictClass::is(stopwatch, classnum(SysStopwatch)));
+        #    this.assertTrue(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testStop
+        #void testStop()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #    int64 zero = 0;
+        #
+        #    sleep(50);
+        #    stopwatch.stop();
+        #
+        #    this.assertNotEqual(zero, stopwatch.elapsedMilliseconds());
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testStop_NotStarted
+        #void testStop_NotStarted()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #    int64 zero = 0;
+        #
+        #    sleep(50);
+        #    stopwatch.stop();
+        #
+        #    this.assertEquals(zero, stopwatch.elapsedMilliseconds());
+        #    this.assertFalse(stopwatch.isRunning());
+        #}
+      ENDSOURCE
+      SOURCE #testToString
+        #void testToString()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::startNew();
+        #    str elapsed;
+        #
+        #    sleep(50);
+        #    elapsed = stopwatch.elapsed();
+        #
+        #    this.assertTrue(match(@':d:d\::d:d\::d:d$', elapsed), elapsed);
+        #}
+      ENDSOURCE
+      SOURCE #testToString_NotStarted
+        #void testToString_NotStarted()
+        #{
+        #    SysStopwatch stopwatch = SysStopwatch::construct();
+        #
+        #    this.assertEquals('00:00:00', stopwatch.toString());
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: PRN
+
+; Microsoft Dynamics Project : SysStopWatch unloaded
+; --------------------------------------------------------------------------------
+  PROJECTVERSION 2
+  
+  PROJECT #SysStopWatch
+   SHARED
+  PROPERTIES
+    Name                #SysStopWatch
+  ENDPROPERTIES
+  
+    BEGINNODE
+      FILETYPE 0
+      UTILTYPE 45
+      UTILOBJECTID 50013
+      NODETYPE 329
+      NAME #SysStopwatch
+    ENDNODE
+    BEGINNODE
+      FILETYPE 0
+      UTILTYPE 45
+      UTILOBJECTID 50014
+      NODETYPE 329
+      NAME #SysStopwatchTest
+    ENDNODE
+  ENDPROJECT
+  
+
+***Element: END
